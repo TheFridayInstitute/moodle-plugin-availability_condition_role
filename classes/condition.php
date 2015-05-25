@@ -58,7 +58,7 @@ class condition extends \core_availability\condition {
     }
 
     public function save() {
-        $result = (object)array('type' => 'group');
+        $result = (object)array('type' => 'role');
         if ($this->groupid) {
             $result->id = $this->groupid;
         }
@@ -68,25 +68,18 @@ class condition extends \core_availability\condition {
     public function is_available($not, \core_availability\info $info, $grabthelot, $userid) {
         $course = $info->get_course();
         $context = \context_course::instance($course->id);
-        $allow = true;
-        if (!has_capability('moodle/site:accessallgroups', $context, $userid)) {
-            // Get all groups the user belongs to.
-            $groups = $info->get_modinfo()->get_groups();
-            if ($this->groupid) {
-                $allow = in_array($this->groupid, $groups);
-            } else {
-                // No specific group. Allow if they belong to any group at all.
-                $allow = $groups ? true : false;
-            }
+        $allow = false;
 
-            // The NOT condition applies before accessallgroups (i.e. if you
-            // set something to be available to those NOT in group X,
-            // people with accessallgroups can still access it even if
-            // they are in group X).
-            if ($not) {
+
+
+        if(user_has_role_assignment($userid, $this->groupid, $context->id)){
+            $allow = true;
+        }
+
+        if ($not) {
                 $allow = !$allow;
             }
-        }
+
         return $allow;
     }
 
@@ -98,21 +91,20 @@ class condition extends \core_availability\condition {
             // a database query. To save queries, get all groups for course at
             // once in a static cache.
             $course = $info->get_course();
-            if (!array_key_exists($this->groupid, self::$groupnames)) {
-                $coursegroups = $DB->get_records(
-                        'groups', array('courseid' => $course->id), '', 'id, name');
-                foreach ($coursegroups as $rec) {
-                    self::$groupnames[$rec->id] = $rec->name;
+            $context = \context_course::instance($course->id);
+            $groups = get_all_roles($context);
+            foreach($groups as $g){
+                if($g->id==$this->groupid){
+                    if(strlen($g->coursealias)==0)$name = $g->name;
+                     else $name = $g->coursealias;
+                    if(strlen($name)==0)$name = $g->shortname;
+                    break;
                 }
             }
 
             // If it still doesn't exist, it must have been misplaced.
-            if (!array_key_exists($this->groupid, self::$groupnames)) {
+            if (strlen($name)==0) {
                 $name = get_string('missing', 'availability_role');
-            } else {
-                $context = \context_course::instance($course->id);
-                $name = format_string(self::$groupnames[$this->groupid], true,
-                        array('context' => $context));
             }
         } else {
             return get_string($not ? 'requires_notanygroup' : 'requires_anygroup',
@@ -246,7 +238,7 @@ class condition extends \core_availability\condition {
      * @return stdClass Object representing condition
      */
     public static function get_json($groupid = 0) {
-        return (object)array('type' => 'group', 'id' => (int)$groupid);
+        return (object)array('type' => 'role', 'id' => (int)$groupid);
     }
 
     public function get_user_list_sql($not, \core_availability\info $info, $onlyactive) {

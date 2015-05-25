@@ -46,14 +46,17 @@ class frontend extends \core_availability\frontend {
     protected function get_javascript_init_params($course, \cm_info $cm = null,
             \section_info $section = null) {
         // Get all groups for course.
-        $groups = $this->get_all_groups($course->id);
+        $groups = $this->get_all_roles($course->id);
 
         // Change to JS array format and return.
         $jsarray = array();
         $context = \context_course::instance($course->id);
         foreach ($groups as $rec) {
+            if(strlen($rec->coursealias)==0)$name = $rec->name;
+            else $name = $rec->coursealias;
+            if(strlen($name)==0)$name = $rec->shortname;
             $jsarray[] = (object)array('id' => $rec->id, 'name' =>
-                    format_string($rec->name, true, array('context' => $context)));
+                    format_string($name, true, array('context' => $context)));
         }
         return array($jsarray);
     }
@@ -64,12 +67,11 @@ class frontend extends \core_availability\frontend {
      * @param int $courseid Course id
      * @return array Array of all the group objects
      */
-    protected function get_all_groups($courseid) {
+    protected function get_all_roles($courseid) {
         global $CFG;
-        require_once($CFG->libdir . '/grouplib.php');
 
         if ($courseid != $this->allgroupscourseid) {
-            $this->allgroups = groups_get_all_groups($courseid, 0, 0, 'g.id, g.name');
+            $this->allgroups = get_all_roles(\context_course::instance($courseid));
             $this->allgroupscourseid = $courseid;
         }
         return $this->allgroups;
@@ -80,6 +82,6 @@ class frontend extends \core_availability\frontend {
         global $CFG;
 
         // Only show this option if there are some groups.
-        return count($this->get_all_groups($course->id)) > 0;
+        return true;
     }
 }
