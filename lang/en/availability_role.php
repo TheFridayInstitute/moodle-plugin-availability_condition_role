@@ -22,13 +22,15 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['anygroup'] = '(Any role)';
-$string['description'] = 'Allow only users who belong to a specified role, or all groups.';
+$string['anyrole'] = '(Any role)';
+$string['description'] = 'Allow only users who belong to a specified role, or all roles.';
+$string['allroles'] ='All Roles';
+$string['anyrole'] = 'Any Role';
 $string['missing'] = '(Missing role)';
 $string['pluginname'] = 'Restriction by role';
-$string['error_selectgroup'] = 'You must select a role.';
-$string['requires_anygroup'] = 'You belong to any role';
-$string['requires_group'] = 'You belong to <strong>{$a}</strong>';
-$string['requires_notanygroup'] = 'You do not belong to any role';
-$string['requires_notgroup'] = 'You do not belong to <strong>{$a}</strong>';
+$string['error_selectrole'] = 'You must select a role.';
+$string['requires_anyrole'] = 'You belong to any role';
+$string['requires_role'] = 'You are a <strong>{$a}</strong>';
+$string['requires_notanyrole'] = 'You do not belong to any role';
+$string['requires_notrole'] = 'You are not a <strong>{$a}</strong>';
 $string['title'] = 'Role';

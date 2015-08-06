@@ -36,7 +36,7 @@ M.availability_role.form.getNode = function(json) {
     var html = '<label>' + M.util.get_string('title', 'availability_role') + ' <span class="availability-group">' +
             '<select name="id">' +
             '<option value="choose">' + M.util.get_string('choosedots', 'moodle') + '</option>' +
-            '<option value="any">' + M.util.get_string('anygroup', 'availability_role') + '</option>';
+            '<option value="any">' + M.util.get_string('anyrole', 'availability_role') + '</option>';
     for (var i = 0; i < this.groups.length; i++) {
         var group = this.groups[i];
         // String has already been escaped using format_string.
@@ -83,7 +83,7 @@ M.availability_role.form.fillErrors = function(errors, node) {
 
     // Check group item id.
     if (value.id && value.id === 'choose') {
-        errors.push('availability_role:error_selectgroup');
+        errors.push('availability_role:error_selectrole');
     }
 };
 

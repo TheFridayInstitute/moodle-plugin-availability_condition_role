@@ -18,7 +18,7 @@
  * Front-end class.
  *
  * @package availability_role
- * @copyright 2014 The Open University
+ * @copyright 2015 Mark Samberg
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -35,23 +35,22 @@ defined('MOODLE_INTERNAL') || die();
  */
 class frontend extends \core_availability\frontend {
     /** @var array Array of group info for course */
-    protected $allgroups;
-    /** @var int Course id that $allgroups is for */
-    protected $allgroupscourseid;
+    protected $allroles;
+
 
     protected function get_javascript_strings() {
-        return array('anygroup');
+        return array('allroles');
     }
 
     protected function get_javascript_init_params($course, \cm_info $cm = null,
             \section_info $section = null) {
-        // Get all groups for course.
-        $groups = $this->get_all_roles($course->id);
+        // Get all roles for course.
+        $roles = $this->get_all_roles($course->id);
 
         // Change to JS array format and return.
         $jsarray = array();
         $context = \context_course::instance($course->id);
-        foreach ($groups as $rec) {
+        foreach ($roles as $rec) {
             if(strlen($rec->coursealias)==0)$name = $rec->name;
             else $name = $rec->coursealias;
             if(strlen($name)==0)$name = $rec->shortname;
@@ -62,19 +61,16 @@ class frontend extends \core_availability\frontend {
     }
 
     /**
-     * Gets all groups for the given course.
+     * Gets all roles for the given course.
      *
      * @param int $courseid Course id
-     * @return array Array of all the group objects
+     * @return array Array of all the roles objects
      */
     protected function get_all_roles($courseid) {
         global $CFG;
 
-        if ($courseid != $this->allgroupscourseid) {
-            $this->allgroups = get_all_roles(\context_course::instance($courseid));
-            $this->allgroupscourseid = $courseid;
-        }
-        return $this->allgroups;
+        $this->allroles = get_all_roles(\context_course::instance($courseid));
+        return $this->allroles;
     }
 
     protected function allow_add($course, \cm_info $cm = null,
